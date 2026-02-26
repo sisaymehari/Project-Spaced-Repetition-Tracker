@@ -1,8 +1,272 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaced Repetition Tracker</title>
     <script type="module" src="script.mjs"></script>
   </head>
   <body>
+    <main>
+      <h1>Spaced Repetition Tracker</h1>
+      
+      <!-- User Selection -->
+      <section aria-labelledby="user-selection-heading">
+        <h2 id="user-selection-heading">Select User</h2>
+        <div class="form-group">
+          <label for="user-select">Choose a user to view their learning agenda:</label>
+          <select id="user-select" aria-describedby="user-select-help">
+            <option value="">-- Select a user --</option>
+          </select>
+          <div id="user-select-help" class="help-text">Select a user to view and manage their spaced repetition topics</div>
+        </div>
+      </section>
+
+      <!-- User Agenda Display -->
+      <section id="agenda-section" aria-labelledby="agenda-heading" style="display: none;">
+        <h2 id="agenda-heading">Learning Agenda</h2>
+        <div id="agenda-content" role="region" aria-live="polite" aria-label="User's revision schedule">
+          <!-- Agenda will be populated here -->
+        </div>
+      </section>
+
+      <!-- Add Topic Form -->
+      <section id="form-section" aria-labelledby="add-topic-heading" style="display: none;">
+        <h2 id="add-topic-heading">Add New Topic</h2>
+        <form id="add-topic-form" novalidate>
+          <fieldset>
+            <legend class="sr-only">Topic Information</legend>
+            
+            <div class="form-group">
+              <label for="topic-name">Topic Name:</label>
+              <input 
+                type="text" 
+                id="topic-name" 
+                name="topicName" 
+                required 
+                aria-describedby="topic-name-error topic-name-help"
+                autocomplete="off"
+                maxlength="100"
+              >
+              <div id="topic-name-help" class="help-text">Enter the name of the topic you want to learn (maximum 100 characters)</div>
+              <div id="topic-name-error" class="error-message" role="alert" aria-live="assertive"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="start-date">Start Date:</label>
+              <input 
+                type="date" 
+                id="start-date" 
+                name="startDate" 
+                required 
+                aria-describedby="start-date-error start-date-help"
+              >
+              <div id="start-date-help" class="help-text">Choose the date when you want to start learning this topic</div>
+              <div id="start-date-error" class="error-message" role="alert" aria-live="assertive"></div>
+            </div>
+            
+            <button type="submit">Add Topic to Schedule</button>
+          </fieldset>
+        </form>
+      </section>
+    </main>
+
+    <!-- Accessible styles -->
+    <style>
+      /* Screen reader only utility */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      
+      /* Form styling */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #212121;
+      }
+      
+      .form-group input, .form-group select {
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 2px solid #757575;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 400px;
+        transition: border-color 0.3s ease;
+      }
+      
+      .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #1565c0;
+        box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.25);
+      }
+      
+      .form-group input[aria-invalid="true"] {
+        border-color: #c62828;
+        background-color: #fff5f5;
+      }
+      
+      .help-text {
+        color: #4a4a4a;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        line-height: 1.4;
+      }
+      
+      .error-message {
+        color: #c62828;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        min-height: 1.2em;
+        line-height: 1.4;
+      }
+      
+      /* Button styling */
+      button {
+        background-color: #1976d2;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        min-height: 44px; /* WCAG touch target minimum */
+        min-width: 44px;
+      }
+      
+      button:hover {
+        background-color: #1565c0;
+      }
+      
+      button:focus {
+        outline: none;
+        background-color: #1565c0;
+        box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.4);
+      }
+      
+      button:active {
+        background-color: #0d47a1;
+      }
+      
+      /* Fieldset styling */
+      fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      /* Section styling */
+      section {
+        margin-bottom: 2rem;
+      }
+      
+      h1, h2 {
+        color: #212121;
+        margin-bottom: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+        border-bottom: 2px solid #bdbdbd;
+        padding-bottom: 0.5rem;
+      }
+      
+      /* Agenda styling */
+      .agenda-item {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        border: 1px solid #9e9e9e;
+        border-radius: 6px;
+        background-color: #f5f5f5;
+        transition: background-color 0.2s ease;
+      }
+      
+      .agenda-item:hover {
+        background-color: #eeeeee;
+      }
+      
+      .agenda-date {
+        font-weight: bold;
+        color: #1565c0;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .agenda-topic {
+        color: #212121;
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+      
+      .no-agenda {
+        padding: 1.5rem;
+        background-color: #f5f5f5;
+        border: 1px solid #9e9e9e;
+        border-radius: 6px;
+        color: #424242;
+        font-style: italic;
+        text-align: center;
+      }
+      
+      /* Responsive design */
+      @media (max-width: 768px) {
+        main {
+          padding: 1rem;
+        }
+        
+        .form-group input, .form-group select {
+          max-width: 100%;
+        }
+      }
+      
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        button {
+          border: 2px solid #ffffff;
+        }
+        
+        .form-group input, .form-group select {
+          border-width: 3px;
+        }
+        
+        .agenda-item {
+          border-width: 2px;
+        }
+        
+        .no-agenda {
+          border-width: 2px;
+        }
+      }
+      
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
   </body>
 </html>
