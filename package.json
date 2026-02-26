@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "scripts": {
     "test": "node test.mjs",
-    "start": "npx http-server -p 3000",
-    "serve": "npx http-server -p 3000"
+    "start": "npx http-server -p 3000"
   }
 }

@@ -46,14 +46,14 @@ export function addYears(date, years) {
  */
 export function calculateRevisionDates(dateString) {
   // Parse date as UTC to avoid timezone issues
-  const startDate = new Date(dateString + 'T00:00:00.000Z');
-  
+  const startDate = new Date(dateString + "T00:00:00.000Z");
+
   return [
-    addDays(startDate, 7),      // 1 week
-    addMonths(startDate, 1),    // 1 month
-    addMonths(startDate, 3),    // 3 months
-    addMonths(startDate, 6),    // 6 months
-    addYears(startDate, 1)      // 1 year
+    addDays(startDate, 7), // 1 week
+    addMonths(startDate, 1), // 1 month
+    addMonths(startDate, 3), // 3 months
+    addMonths(startDate, 6), // 6 months
+    addYears(startDate, 1), // 1 year
   ];
 }
 
@@ -64,15 +64,15 @@ export function calculateRevisionDates(dateString) {
  */
 export function formatDate(date) {
   const day = date.getUTCDate();
-  const month = date.toLocaleDateString('en-GB', { 
-    month: 'long',
-    timeZone: 'UTC'
+  const month = date.toLocaleDateString("en-GB", {
+    month: "long",
+    timeZone: "UTC",
   });
   const year = date.getUTCFullYear();
-  
+
   // Add ordinal suffix to day
   const ordinal = getOrdinalSuffix(day);
-  
+
   return `${day}${ordinal} ${month} ${year}`;
 }
 
@@ -83,15 +83,19 @@ export function formatDate(date) {
  */
 function getOrdinalSuffix(num) {
   if (num >= 11 && num <= 13) {
-    return 'th';
+    return "th";
   }
-  
+
   const lastDigit = num % 10;
   switch (lastDigit) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
   }
 }
 
@@ -120,5 +124,5 @@ export function isFutureDate(date) {
  */
 export function getTodayString() {
   const today = new Date();
-  return today.toISOString().split('T')[0];
+  return today.toISOString().split("T")[0];
 }
